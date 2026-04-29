@@ -27,3 +27,5 @@ data/
 # OS
 .DS_Store
 EOF
+
+*.traineddata
