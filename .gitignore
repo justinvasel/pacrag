@@ -1,0 +1,29 @@
+cat > .gitignore <<'EOF'
+# Python
+__pycache__/
+*.pyc
+.venv/
+.uv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.pyright/
+
+# Node
+node_modules/
+.next/
+.turbo/
+dist/
+build/
+
+# Data and models (gitignored, large, regeneratable)
+data/
+
+# Env and secrets
+.env
+.env.local
+*.env
+
+# OS
+.DS_Store
+EOF
