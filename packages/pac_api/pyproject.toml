@@ -1,0 +1,33 @@
+[project]
+name = "pac-api"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Justin Vasel", email = "justin.vasel@gmail.com" }
+]
+requires-python = ">=3.8"
+dependencies = [
+    "anthropic>=0.97.0",
+    "duckdb>=1.5.2",
+    "fastapi>=0.136.1",
+    "pac-crawler",
+    "pac-pipeline",
+    "pydantic-settings>=2.14.0",
+    "python-dotenv>=1.2.2",
+    "qdrant-client>=1.17.1",
+    "sentence-transformers>=5.4.1",
+    "structlog>=25.5.0",
+    "tantivy>=0.26.0",
+    "torch>=2.11.0",
+    "transformers>=5.7.0",
+    "uvicorn[standard]>=0.46.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv.sources]
+pac-crawler = { workspace = true }
+pac-pipeline = { workspace = true }
