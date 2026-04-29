@@ -37,3 +37,4 @@ typeCheckingMode = "standard"
 [tool.pytest.ini_options]
 testpaths = ["packages", "tests"]
 asyncio_mode = "auto"
+addopts = "--import-mode=importlib"
