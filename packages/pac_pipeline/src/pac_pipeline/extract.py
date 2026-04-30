@@ -13,8 +13,11 @@ from pac_pipeline.extract_db import ExtractDB
 from pac_pipeline.extract_models import (
     EXTRACTOR_VERSION,
     ISSUE_TAGS,
+    ISSUE_TAGS_SET,
+    ExtractionResult,
     LLMExtractionResponse,
     OpinionMetadata,
+    RejectedTagSuggestion,
 )
 from pac_pipeline.models import ParsedOpinion
 
@@ -22,7 +25,6 @@ log = structlog.get_logger()
 
 _MAX_RETRIES = 2
 _MAX_FULL_TEXT_CHARS = 15_000
-_CAPTION_CHARS = 500
 
 _SYSTEM_PROMPT = (
     """\
@@ -97,7 +99,8 @@ def build_text_payload(parsed: ParsedOpinion) -> str:
     if not parsed.sections:
         return parsed.full_text[:_MAX_FULL_TEXT_CHARS]
 
-    caption = parsed.full_text[:_CAPTION_CHARS]
+    first_section_start = min(start for start, _end in parsed.sections.values())
+    caption = parsed.full_text[:first_section_start]
 
     section_order = ["BACKGROUND", "ANALYSIS", "DISCUSSION", "OPINION", "CONCLUSION"]
     section_texts: list[str] = []
@@ -114,7 +117,7 @@ def extract_one(
     parsed: ParsedOpinion,
     counselor_name: str | None,
     client: Anthropic,
-) -> OpinionMetadata:
+) -> ExtractionResult:
     text_payload = build_text_payload(parsed)
 
     messages: list[dict[str, object]] = [
@@ -122,6 +125,7 @@ def extract_one(
     ]
 
     last_error: Exception | None = None
+    rejected_tags: list[RejectedTagSuggestion] = []
 
     for attempt in range(_MAX_RETRIES + 1):
         response = client.messages.create(
@@ -144,6 +148,19 @@ def extract_one(
         try:
             llm_response = LLMExtractionResponse.model_validate(tool_block.input)
 
+            invalid_tags = [t for t in llm_response.issue_tags if t not in ISSUE_TAGS_SET]
+            if invalid_tags:
+                all_tags = tuple(llm_response.issue_tags)
+                for tag in invalid_tags:
+                    rejected_tags.append(
+                        RejectedTagSuggestion(
+                            opinion_id=opinion_id,
+                            suggested_tag=tag,
+                            attempt=attempt,
+                            all_suggested_tags=all_tags,
+                        )
+                    )
+
             issue_date: date | None = None
             if llm_response.issue_date:
                 try:
@@ -155,7 +172,7 @@ def extract_one(
                         raw_date=llm_response.issue_date,
                     )
 
-            return OpinionMetadata(
+            metadata = OpinionMetadata(
                 opinion_id=opinion_id,
                 issue_date=issue_date,
                 counselor=counselor_name,
@@ -169,6 +186,7 @@ def extract_one(
                 finding=llm_response.finding,
                 summary=llm_response.summary,
             )
+            return ExtractionResult(metadata=metadata, rejected_tags=tuple(rejected_tags))
         except Exception as e:
             last_error = e
             log.warning(
@@ -232,9 +250,14 @@ def extract_all(
                 parsed = ParsedOpinion.model_validate_json(parse_path.read_text())
                 counselor_name = extract_counselor(parsed.full_text)
 
-                metadata = extract_one(oid, parsed, counselor_name, client)
+                result = extract_one(oid, parsed, counselor_name, client)
 
-                db.upsert_metadata(metadata, extractor_version=EXTRACTOR_VERSION)
+                db.upsert_metadata(result.metadata, extractor_version=EXTRACTOR_VERSION)
+                if result.rejected_tags:
+                    db.insert_rejected_tags(
+                        result.rejected_tags,
+                        extractor_version=EXTRACTOR_VERSION,
+                    )
                 db.update_extract_status(oid, "ok")
                 extracted_count += 1
             except Exception:

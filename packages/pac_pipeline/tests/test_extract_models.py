@@ -6,8 +6,10 @@ import pytest
 from pac_pipeline.extract_models import (
     EXTRACTOR_VERSION,
     ISSUE_TAGS,
+    ExtractionResult,
     LLMExtractionResponse,
     OpinionMetadata,
+    RejectedTagSuggestion,
 )
 from pydantic import ValidationError
 
@@ -233,6 +235,76 @@ class TestIssueTagsVocabulary:
         ]
         for tag in expected:
             assert tag in ISSUE_TAGS
+
+
+class TestRejectedTagSuggestion:
+    def test_construction(self) -> None:
+        tag = RejectedTagSuggestion(
+            opinion_id="25-FC-100",
+            suggested_tag="public-record-definition",
+            attempt=0,
+            all_suggested_tags=("denial-of-access", "public-record-definition"),
+        )
+        assert tag.opinion_id == "25-FC-100"
+        assert tag.suggested_tag == "public-record-definition"
+        assert tag.attempt == 0
+        assert len(tag.all_suggested_tags) == 2
+
+    def test_frozen(self) -> None:
+        tag = RejectedTagSuggestion(
+            opinion_id="25-FC-100",
+            suggested_tag="fake-tag",
+            attempt=0,
+            all_suggested_tags=("fake-tag",),
+        )
+        with pytest.raises(AttributeError):
+            tag.suggested_tag = "other"  # type: ignore[misc]
+
+
+class TestExtractionResult:
+    def test_with_no_rejected_tags(self) -> None:
+        meta = OpinionMetadata(
+            opinion_id="25-FC-100",
+            issue_date=None,
+            counselor=None,
+            complainant=None,
+            public_agency="Some Agency",
+            agency_type="city",
+            statutes_invoked=[],
+            statute_areas=["APRA"],
+            issue_tags=[],
+            tags_need_review=False,
+            finding="no_violation",
+            summary="Summary.",
+        )
+        result = ExtractionResult(metadata=meta, rejected_tags=())
+        assert result.metadata.opinion_id == "25-FC-100"
+        assert result.rejected_tags == ()
+
+    def test_with_rejected_tags(self) -> None:
+        meta = OpinionMetadata(
+            opinion_id="25-FC-100",
+            issue_date=None,
+            counselor=None,
+            complainant=None,
+            public_agency="Some Agency",
+            agency_type="city",
+            statutes_invoked=[],
+            statute_areas=["APRA"],
+            issue_tags=["denial-of-access"],
+            tags_need_review=False,
+            finding="no_violation",
+            summary="Summary.",
+        )
+        tag = RejectedTagSuggestion(
+            opinion_id="25-FC-100",
+            suggested_tag="fake-tag",
+            attempt=0,
+            all_suggested_tags=("denial-of-access", "fake-tag"),
+        )
+        result = ExtractionResult(metadata=meta, rejected_tags=(tag,))
+        assert len(result.rejected_tags) == 1
+        assert result.rejected_tags[0].suggested_tag == "fake-tag"
 
 
 class TestExtractorVersion:

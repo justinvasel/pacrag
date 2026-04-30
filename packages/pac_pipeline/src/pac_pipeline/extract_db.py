@@ -7,7 +7,7 @@ from typing import Self
 import duckdb
 import structlog
 
-from pac_pipeline.extract_models import OpinionMetadata
+from pac_pipeline.extract_models import OpinionMetadata, RejectedTagSuggestion
 
 log = structlog.get_logger()
 
@@ -81,6 +81,25 @@ ON CONFLICT (opinion_id) DO UPDATE SET
     extractor_version = excluded.extractor_version
 """
 
+_CREATE_REJECTED_TAGS_TABLE = """
+CREATE TABLE IF NOT EXISTS rejected_tag_suggestions (
+    id INTEGER PRIMARY KEY DEFAULT nextval('rejected_tag_suggestions_seq'),
+    opinion_id TEXT NOT NULL,
+    suggested_tag TEXT NOT NULL,
+    attempt INTEGER NOT NULL,
+    all_suggested_tags TEXT[] NOT NULL,
+    suggested_at TIMESTAMP NOT NULL,
+    extractor_version TEXT NOT NULL
+)
+"""
+
+_INSERT_REJECTED_TAG = """
+INSERT INTO rejected_tag_suggestions (
+    opinion_id, suggested_tag, attempt, all_suggested_tags,
+    suggested_at, extractor_version
+) VALUES (?, ?, ?, ?, ?, ?)
+"""
+
 _COPY_TO_HISTORY = """
 INSERT INTO opinion_metadata_history (
     opinion_id, issue_date, counselor, complainant, public_agency,
@@ -112,8 +131,10 @@ class ExtractDB:
 
     def _ensure_tables(self) -> None:
         self._conn.execute("CREATE SEQUENCE IF NOT EXISTS opinion_metadata_history_seq START 1")
+        self._conn.execute("CREATE SEQUENCE IF NOT EXISTS rejected_tag_suggestions_seq START 1")
         self._conn.execute(_CREATE_METADATA_TABLE)
         self._conn.execute(_CREATE_HISTORY_TABLE)
+        self._conn.execute(_CREATE_REJECTED_TAGS_TABLE)
         for sql in _ALTER_SQLS:
             self._conn.execute(sql)
 
@@ -204,3 +225,39 @@ class ExtractDB:
             "SELECT extract_status, count(*) FROM opinions GROUP BY extract_status"
         ).fetchall()
         return {row[0]: row[1] for row in rows}
+
+    def insert_rejected_tags(
+        self,
+        rejected_tags: tuple[RejectedTagSuggestion, ...],
+        *,
+        extractor_version: str,
+    ) -> None:
+        now = datetime.now(UTC)
+        for tag in rejected_tags:
+            self._conn.execute(
+                _INSERT_REJECTED_TAG,
+                [
+                    tag.opinion_id,
+                    tag.suggested_tag,
+                    tag.attempt,
+                    list(tag.all_suggested_tags),
+                    now,
+                    extractor_version,
+                ],
+            )
+
+    def get_top_rejected_tags(self, *, limit: int = 20) -> list[tuple[str, int, int]]:
+        rows = self._conn.execute(
+            """
+            SELECT
+                suggested_tag,
+                COUNT(*) AS suggestion_count,
+                COUNT(DISTINCT opinion_id) AS opinion_count
+            FROM rejected_tag_suggestions
+            GROUP BY suggested_tag
+            ORDER BY suggestion_count DESC
+            LIMIT ?
+            """,
+            [limit],
+        ).fetchall()
+        return [(row[0], row[1], row[2]) for row in rows]

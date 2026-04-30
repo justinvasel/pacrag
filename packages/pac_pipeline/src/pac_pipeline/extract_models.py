@@ -1,11 +1,12 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from datetime import date
 from typing import Literal
 
 from pydantic import BaseModel, field_validator
 
-EXTRACTOR_VERSION: str = "0.2.0"
+EXTRACTOR_VERSION: str = "0.3.0"
 
 ISSUE_TAGS: list[str] = [
     "deliberative-materials",
@@ -44,7 +45,7 @@ ISSUE_TAGS: list[str] = [
     "standing-to-complain",
 ]
 
-_ISSUE_TAGS_SET: frozenset[str] = frozenset(ISSUE_TAGS)
+ISSUE_TAGS_SET: frozenset[str] = frozenset(ISSUE_TAGS)
 
 AgencyType = Literal[
     "county",
@@ -88,7 +89,7 @@ class OpinionMetadata(BaseModel, frozen=True):
     @field_validator("issue_tags")
     @classmethod
     def validate_issue_tags(cls, v: list[str]) -> list[str]:
-        invalid = [t for t in v if t not in _ISSUE_TAGS_SET]
+        invalid = [t for t in v if t not in ISSUE_TAGS_SET]
         if invalid:
             raise ValueError(f"Invalid issue tags: {invalid}. Must be from controlled vocabulary.")
         return v
@@ -105,3 +106,17 @@ class LLMExtractionResponse(BaseModel, frozen=True):
     tags_need_review: bool
     finding: Finding
     summary: str
+
+
+@dataclass(frozen=True)
+class RejectedTagSuggestion:
+    opinion_id: str
+    suggested_tag: str
+    attempt: int
+    all_suggested_tags: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class ExtractionResult:
+    metadata: OpinionMetadata
+    rejected_tags: tuple[RejectedTagSuggestion, ...]

@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 from pac_pipeline.extract_db import ExtractDB
-from pac_pipeline.extract_models import OpinionMetadata
+from pac_pipeline.extract_models import OpinionMetadata, RejectedTagSuggestion
 
 
 @pytest.fixture
@@ -200,6 +200,85 @@ class TestCountByExtractStatus:
         extract_db.update_extract_status("25-FC-118", "ok")
         counts = extract_db.count_by_extract_status()
         assert counts.get("ok", 0) == 1
+
+
+class TestRejectedTagSuggestions:
+    def test_creates_table(self, extract_db: ExtractDB) -> None:
+        rows = extract_db._conn.execute(
+            "SELECT table_name FROM information_schema.tables "
+            "WHERE table_name = 'rejected_tag_suggestions'"
+        ).fetchall()
+        assert len(rows) == 1
+
+    def test_inserts_and_queries(self, extract_db: ExtractDB) -> None:
+        tags = (
+            RejectedTagSuggestion(
+                opinion_id="25-FC-100",
+                suggested_tag="public-record-definition",
+                attempt=0,
+                all_suggested_tags=("denial-of-access", "public-record-definition"),
+            ),
+        )
+        extract_db.insert_rejected_tags(tags, extractor_version="0.3.0")
+        rows = extract_db._conn.execute(
+            "SELECT opinion_id, suggested_tag, attempt, all_suggested_tags "
+            "FROM rejected_tag_suggestions"
+        ).fetchall()
+        assert len(rows) == 1
+        assert rows[0][0] == "25-FC-100"
+        assert rows[0][1] == "public-record-definition"
+        assert rows[0][2] == 0
+        assert rows[0][3] == ["denial-of-access", "public-record-definition"]
+
+    def test_get_top_rejected_tags_ordered(self, extract_db: ExtractDB) -> None:
+        tags = (
+            RejectedTagSuggestion(
+                opinion_id="25-FC-100",
+                suggested_tag="final-action",
+                attempt=0,
+                all_suggested_tags=("final-action",),
+            ),
+            RejectedTagSuggestion(
+                opinion_id="25-FC-118",
+                suggested_tag="final-action",
+                attempt=0,
+                all_suggested_tags=("final-action",),
+            ),
+            RejectedTagSuggestion(
+                opinion_id="25-FC-100",
+                suggested_tag="public-records",
+                attempt=0,
+                all_suggested_tags=("public-records",),
+            ),
+        )
+        extract_db.insert_rejected_tags(tags, extractor_version="0.3.0")
+        top = extract_db.get_top_rejected_tags(limit=10)
+        assert top[0][0] == "final-action"
+        assert top[0][1] == 2  # suggestion_count
+        assert top[0][2] == 2  # distinct opinions
+        assert top[1][0] == "public-records"
+        assert top[1][1] == 1
+
+    def test_get_top_rejected_tags_distinct_opinions(self, extract_db: ExtractDB) -> None:
+        tags = (
+            RejectedTagSuggestion(
+                opinion_id="25-FC-100",
+                suggested_tag="retention-of-records",
+                attempt=0,
+                all_suggested_tags=("retention-of-records",),
+            ),
+            RejectedTagSuggestion(
+                opinion_id="25-FC-100",
+                suggested_tag="retention-of-records",
+                attempt=1,
+                all_suggested_tags=("retention-of-records",),
+            ),
+        )
+        extract_db.insert_rejected_tags(tags, extractor_version="0.3.0")
+        top = extract_db.get_top_rejected_tags(limit=10)
+        assert top[0][0] == "retention-of-records"
+        assert top[0][1] == 2  # two suggestions
+        assert top[0][2] == 1  # but only one opinion
 
 
 def _make_metadata(

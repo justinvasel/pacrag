@@ -7,7 +7,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 from pac_pipeline.extract import build_text_payload, extract_all, extract_one
 from pac_pipeline.extract_db import ExtractDB
-from pac_pipeline.extract_models import OpinionMetadata
+from pac_pipeline.extract_models import ExtractionResult, OpinionMetadata
 from pac_pipeline.models import ParsedOpinion, ParsedPage
 
 
@@ -120,6 +120,54 @@ class TestBuildTextPayload:
         assert "David Askins" in payload
         assert "City of Bloomington" in payload
 
+    def test_long_header_not_truncated(self) -> None:
+        letterhead = "STATE OF INDIANA " + " " * 500 + "PUBLIC ACCESS COUNSELOR\n"
+        metadata_block = (
+            "December 3, 2025\n\n"
+            "Re: Complaint 25-FC-014\n"
+            "Melissa Wechsler (Complainant) v.\n"
+            "Whitley County Consolidated Schools (Respondent)\n\n"
+        )
+        body = (
+            "BACKGROUND\n\n"
+            "The complainant alleges a violation.\n\n"
+            "ANALYSIS\n\n"
+            "The PAC analyzes the complaint.\n\n"
+            "CONCLUSION\n\n"
+            "Based on the foregoing, a violation is found.\n"
+        )
+        full_text = letterhead + metadata_block + body
+
+        bg_start = full_text.index("BACKGROUND\n\n") + len("BACKGROUND\n\n")
+        bg_end = full_text.index("\n\nANALYSIS")
+        an_start = full_text.index("ANALYSIS\n\n") + len("ANALYSIS\n\n")
+        an_end = full_text.index("\n\nCONCLUSION")
+        co_start = full_text.index("CONCLUSION\n\n") + len("CONCLUSION\n\n")
+        co_end = len(full_text.rstrip())
+
+        parsed = ParsedOpinion(
+            opinion_id="25-FC-014",
+            full_text=full_text,
+            pages=[
+                ParsedPage(page_num=1, text=full_text, char_count=len(full_text), ocr_used=False)
+            ],
+            sections={
+                "BACKGROUND": (bg_start, bg_end),
+                "ANALYSIS": (an_start, an_end),
+                "CONCLUSION": (co_start, co_end),
+            },
+            parser_version="0.1.0",
+        )
+
+        payload = build_text_payload(parsed)
+
+        assert "December 3, 2025" in payload
+        assert "Melissa Wechsler" in payload
+        assert "Whitley County Consolidated Schools" in payload
+        assert "[BACKGROUND]" in payload
+        assert "[ANALYSIS]" in payload
+        assert "[CONCLUSION]" in payload
+
 
 class TestExtractOne:
     def test_returns_valid_metadata(self) -> None:
@@ -134,12 +182,25 @@ class TestExtractOne:
             client=mock_client,
         )
 
-        assert isinstance(result, OpinionMetadata)
-        assert result.opinion_id == "25-FC-118"
-        assert result.counselor == "Jennifer G. Ruby"
-        assert result.finding == "violation"
-        assert result.public_agency == "City of Bloomington"
-        assert result.issue_date == date(2026, 2, 2)
+        assert isinstance(result, ExtractionResult)
+        assert result.metadata.opinion_id == "25-FC-118"
+        assert result.metadata.counselor == "Jennifer G. Ruby"
+        assert result.metadata.finding == "violation"
+        assert result.metadata.public_agency == "City of Bloomington"
+        assert result.metadata.issue_date == date(2026, 2, 2)
+
+    def test_no_rejected_tags_when_all_valid(self) -> None:
+        parsed = _make_parsed()
+        mock_client = MagicMock()
+        mock_client.messages.create.return_value = _make_tool_use_response()
+
+        result = extract_one(
+            opinion_id="25-FC-118",
+            parsed=parsed,
+            counselor_name="Jennifer G. Ruby",
+            client=mock_client,
+        )
+        assert result.rejected_tags == ()
 
     def test_uses_counselor_from_argument(self) -> None:
         parsed = _make_parsed()
@@ -152,7 +213,7 @@ class TestExtractOne:
             counselor_name="Luke H. Britt",
             client=mock_client,
         )
-        assert result.counselor == "Luke H. Britt"
+        assert result.metadata.counselor == "Luke H. Britt"
 
     def test_handles_null_counselor(self) -> None:
         parsed = _make_parsed()
@@ -165,7 +226,7 @@ class TestExtractOne:
             counselor_name=None,
             client=mock_client,
         )
-        assert result.counselor is None
+        assert result.metadata.counselor is None
 
     def test_retries_on_validation_failure(self) -> None:
         parsed = _make_parsed()
@@ -181,7 +242,7 @@ class TestExtractOne:
             counselor_name="Jennifer G. Ruby",
             client=mock_client,
         )
-        assert isinstance(result, OpinionMetadata)
+        assert isinstance(result.metadata, OpinionMetadata)
         assert mock_client.messages.create.call_count == 2
 
     def test_retries_on_invalid_issue_tags(self) -> None:
@@ -198,9 +259,11 @@ class TestExtractOne:
             counselor_name="Jennifer G. Ruby",
             client=mock_client,
         )
-        assert isinstance(result, OpinionMetadata)
-        assert result.issue_tags == ["denial-of-access"]
+        assert result.metadata.issue_tags == ["denial-of-access"]
         assert mock_client.messages.create.call_count == 2
+        assert len(result.rejected_tags) == 1
+        assert result.rejected_tags[0].suggested_tag == "not-a-real-tag"
+        assert result.rejected_tags[0].attempt == 0
 
     def test_raises_after_max_retries(self) -> None:
         parsed = _make_parsed()
@@ -226,7 +289,7 @@ class TestExtractOne:
             counselor_name=None,
             client=mock_client,
         )
-        assert isinstance(result, OpinionMetadata)
+        assert isinstance(result.metadata, OpinionMetadata)
         mock_client.messages.create.assert_called_once()
 
 
