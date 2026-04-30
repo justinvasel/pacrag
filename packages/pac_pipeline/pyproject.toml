@@ -25,6 +25,7 @@ dependencies = [
 
 [project.scripts]
 pac-parse = "pac_pipeline.cli:main"
+pac-extract = "pac_pipeline.extract_cli:main"
 
 [build-system]
 requires = ["hatchling"]

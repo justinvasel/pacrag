@@ -33,6 +33,12 @@ async def download_opinion_pdf(
     """
     dest = pdf_dest_path(data_dir, entry.year, entry.opinion_id)
 
+    if dest.exists() and dest.stat().st_size > 0:
+        existing_data = dest.read_bytes()
+        sha = compute_sha256(existing_data)
+        log.debug("download_skipped_exists", opinion_id=entry.opinion_id, path=str(dest))
+        return dest, sha, "skipped"
+
     try:
         data = await download_file(client, entry.pdf_url, dest, limiter)
     except httpx.HTTPStatusError as e:

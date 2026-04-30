@@ -135,6 +135,59 @@ class TestRunWithDownloads:
             assert counts.get("ok", 0) == 2
             assert counts.get("pending", 0) == 3
 
+    async def test_second_run_skips_already_downloaded(self, tmp_path: Path) -> None:
+        db_path = tmp_path / "test.duckdb"
+        entries = _make_entries(3)
+        pdf_data = b"%PDF fake"
+
+        with (
+            patch(
+                "pac_crawler.cli.discover_all_listings",
+                new_callable=AsyncMock,
+                return_value=entries,
+            ),
+            patch(
+                "pac_crawler.downloader.download_file",
+                new_callable=AsyncMock,
+                return_value=pdf_data,
+            ),
+        ):
+            await run(
+                data_dir=tmp_path,
+                db_path=db_path,
+                year_filter=None,
+                kind_filter=None,
+                listing_only=False,
+                limit=None,
+            )
+
+        with (
+            patch(
+                "pac_crawler.cli.discover_all_listings",
+                new_callable=AsyncMock,
+                return_value=entries,
+            ),
+            patch(
+                "pac_crawler.downloader.download_file",
+                new_callable=AsyncMock,
+                return_value=pdf_data,
+            ) as mock_dl,
+        ):
+            await run(
+                data_dir=tmp_path,
+                db_path=db_path,
+                year_filter=None,
+                kind_filter=None,
+                listing_only=False,
+                limit=None,
+            )
+
+        mock_dl.assert_not_called()
+
+        with ManifestDB(db_path) as db:
+            counts = db.count_by_status()
+            assert counts.get("ok", 0) == 3
+
 
 class TestMarkMissing:
     async def test_removed_opinions_marked_missing(self, tmp_path: Path) -> None:

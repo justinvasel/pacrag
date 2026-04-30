@@ -92,6 +92,29 @@ class TestDownloadOpinionPdf:
 
         assert status == "skipped"
 
+    async def test_skipped_when_file_exists_on_disk(
+        self, tmp_path: Path, entry: ListingEntry, limiter: RateLimiter
+    ) -> None:
+        dest = pdf_dest_path(tmp_path, entry.year, entry.opinion_id)
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        pdf_data = b"%PDF-1.4 fake content"
+        dest.write_bytes(pdf_data)
+
+        mock_client = AsyncMock()
+
+        with patch(
+            "pac_crawler.downloader.download_file",
+            new_callable=AsyncMock,
+        ) as mock_download:
+            path, sha, status = await download_opinion_pdf(
+                mock_client, entry, tmp_path, None, limiter
+            )
+
+        assert status == "skipped"
+        assert sha == compute_sha256(pdf_data)
+        assert path == dest
+        mock_download.assert_not_called()
+
     async def test_http_error(
         self, tmp_path: Path, entry: ListingEntry, limiter: RateLimiter
     ) -> None:

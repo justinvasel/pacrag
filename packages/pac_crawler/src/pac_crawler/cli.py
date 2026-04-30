@@ -9,7 +9,7 @@ from pathlib import Path
 import structlog
 from dotenv import load_dotenv
 
-from pac_crawler.downloader import download_all
+from pac_crawler.downloader import download_opinion_pdf
 from pac_crawler.http_client import RateLimiter, build_client
 from pac_crawler.listing_parser import discover_all_listings
 from pac_crawler.manifest import ManifestDB
@@ -99,18 +99,26 @@ async def run(
                 if not pending:
                     log.info("no_pending_downloads")
                 else:
-                    results = await download_all(
-                        client, pending, data_dir, existing_hashes, limiter, limit=limit
-                    )
-                    for opinion_id, path, sha, status in results:
-                        if status in ("ok", "skipped"):
-                            db.update_download(opinion_id, str(path), sha, "ok")
-                        elif status == "http_error":
-                            db.update_download(opinion_id, "", "", "http_error")
+                    to_download = pending[:limit] if limit else pending
+                    ok_count = 0
+                    skip_count = 0
+                    err_count = 0
 
-                    ok_count = sum(1 for _, _, _, s in results if s == "ok")
-                    skip_count = sum(1 for _, _, _, s in results if s == "skipped")
-                    err_count = sum(1 for _, _, _, s in results if s == "http_error")
+                    for entry in to_download:
+                        existing_sha = existing_hashes.get(entry.opinion_id)
+                        path, sha, status = await download_opinion_pdf(
+                            client, entry, data_dir, existing_sha, limiter
+                        )
+                        if status in ("ok", "skipped"):
+                            db.update_download(entry.opinion_id, str(path), sha, "ok")
+                            if status == "ok":
+                                ok_count += 1
+                            else:
+                                skip_count += 1
+                        elif status == "http_error":
+                            db.update_download(entry.opinion_id, "", "", "http_error")
+                            err_count += 1
+
                     log.info(
                         "downloads_complete",
                         ok=ok_count,

@@ -110,3 +110,28 @@ def tmp_db_with_opinions(tmp_db: Path) -> Path:
     )
     conn.close()
     return tmp_db
+
+
+@pytest.fixture
+def tmp_db_with_parsed_opinions(tmp_db_with_opinions: Path) -> Path:
+    now = datetime.now(UTC)
+    conn = duckdb.connect(str(tmp_db_with_opinions))
+    conn.execute(
+        "ALTER TABLE opinions ADD COLUMN IF NOT EXISTS parse_status TEXT DEFAULT 'pending'"
+    )
+    conn.execute("ALTER TABLE opinions ADD COLUMN IF NOT EXISTS parse_path TEXT")
+    conn.execute("ALTER TABLE opinions ADD COLUMN IF NOT EXISTS parsed_at TIMESTAMP")
+    conn.execute("ALTER TABLE opinions ADD COLUMN IF NOT EXISTS parser_version TEXT")
+    conn.execute(
+        """
+        UPDATE opinions
+        SET parse_status = 'ok',
+            parse_path = 'data/parsed/' || year || '/' || opinion_id || '.json',
+            parsed_at = ?,
+            parser_version = '0.1.0'
+        WHERE download_status = 'ok'
+        """,
+        [now],
+    )
+    conn.close()
+    return tmp_db_with_opinions
