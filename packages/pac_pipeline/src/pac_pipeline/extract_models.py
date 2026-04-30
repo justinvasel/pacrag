@@ -6,7 +6,7 @@ from typing import Literal
 
 from pydantic import BaseModel, field_validator
 
-EXTRACTOR_VERSION: str = "0.3.0"
+EXTRACTOR_VERSION: str = "0.4.0"
 
 ISSUE_TAGS: list[str] = [
     "deliberative-materials",
