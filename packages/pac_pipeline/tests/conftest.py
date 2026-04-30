@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from pathlib import Path
 
 import duckdb
@@ -135,3 +135,65 @@ def tmp_db_with_parsed_opinions(tmp_db_with_opinions: Path) -> Path:
     )
     conn.close()
     return tmp_db_with_opinions
+
+
+@pytest.fixture
+def tmp_db_with_extracted_opinions(tmp_db_with_parsed_opinions: Path) -> Path:
+    now = datetime.now(UTC)
+    conn = duckdb.connect(str(tmp_db_with_parsed_opinions))
+    conn.execute(
+        "ALTER TABLE opinions ADD COLUMN IF NOT EXISTS extract_status TEXT DEFAULT 'pending'"
+    )
+    conn.execute("UPDATE opinions SET extract_status = 'ok' WHERE parse_status = 'ok'")
+
+    conn.execute("CREATE SEQUENCE IF NOT EXISTS opinion_metadata_history_seq START 1")
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS opinion_metadata (
+            opinion_id TEXT PRIMARY KEY,
+            issue_date DATE,
+            counselor TEXT,
+            complainant TEXT,
+            public_agency TEXT NOT NULL,
+            agency_type TEXT NOT NULL,
+            statutes_invoked TEXT[] NOT NULL,
+            statute_areas TEXT[] NOT NULL,
+            issue_tags TEXT[] NOT NULL,
+            tags_need_review BOOLEAN NOT NULL DEFAULT false,
+            finding TEXT NOT NULL,
+            summary TEXT NOT NULL,
+            extracted_at TIMESTAMP NOT NULL,
+            extractor_version TEXT NOT NULL
+        )
+    """)
+
+    for oid, agency in [
+        ("25-FC-118", "City of Bloomington"),
+        ("25-FC-002A", "Some Agency"),
+    ]:
+        conn.execute(
+            """
+            INSERT INTO opinion_metadata (
+                opinion_id, issue_date, counselor, complainant, public_agency,
+                agency_type, statutes_invoked, statute_areas, issue_tags,
+                tags_need_review, finding, summary, extracted_at, extractor_version
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            [
+                oid,
+                date(2026, 2, 2),
+                "Jennifer G. Ruby",
+                "David Askins",
+                agency,
+                "city",
+                ["IC 5-14-3-4(b)(20)"],
+                ["APRA"],
+                ["denial-of-access"],
+                False,
+                "violation",
+                f"The PAC found a violation of APRA by {agency}.",
+                now,
+                "0.4.0",
+            ],
+        )
+    conn.close()
+    return tmp_db_with_parsed_opinions
