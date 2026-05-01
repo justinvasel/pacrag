@@ -28,6 +28,7 @@ async def list_opinions(
     finding: str | None = Query(default=None),
     statute_areas: list[str] | None = Query(default=None),
     issue_tags: list[str] | None = Query(default=None),
+    q: str | None = Query(default=None),
     db: OpinionDB = Depends(get_db),
 ) -> OpinionListResponse:
     items, total = db.list_opinions(
@@ -39,6 +40,7 @@ async def list_opinions(
         finding=finding,
         statute_areas=statute_areas,
         issue_tags=issue_tags,
+        q=q,
     )
 
     total_pages = max(1, math.ceil(total / page_size))

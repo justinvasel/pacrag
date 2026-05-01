@@ -69,6 +69,7 @@ class OpinionDB:
         finding: str | None = None,
         statute_areas: list[str] | None = None,
         issue_tags: list[str] | None = None,
+        q: str | None = None,
     ) -> tuple[list[dict[str, Any]], int]:
         conditions: list[str] = []
         params: list[object] = []
@@ -95,6 +96,12 @@ class OpinionDB:
             tag_conditions = " OR ".join("list_contains(m.issue_tags, ?)" for _ in issue_tags)
             conditions.append(f"({tag_conditions})")
             params.extend(issue_tags)
+        if q:
+            keyword = f"%{q}%"
+            conditions.append(
+                "(o.opinion_id ILIKE ? OR o.agency_name ILIKE ? OR m.summary ILIKE ?)"
+            )
+            params.extend([keyword, keyword, keyword])
 
         where = " AND ".join(conditions)
         where_clause = f"WHERE {where}" if where else ""
