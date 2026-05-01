@@ -9,11 +9,19 @@ from httpx import AsyncClient
 class TestHealthz:
     @pytest.mark.asyncio
     async def test_healthz_returns_counts(self, client: AsyncClient) -> None:
-        mock_collection = MagicMock()
-        mock_collection.points_count = 3
+        mock_qdrant = MagicMock()
+        mock_qdrant.close = AsyncMock()
 
         with (
-            patch("pac_api.routes.health._qdrant_count", new_callable=AsyncMock, return_value=3),
+            patch(
+                "pac_api.routes.health.AsyncQdrantClient",
+                return_value=mock_qdrant,
+            ),
+            patch(
+                "pac_api.routes.health._qdrant_count",
+                new_callable=AsyncMock,
+                return_value=3,
+            ),
             patch("pac_api.routes.health._tantivy_count", return_value=3),
         ):
             response = await client.get("/healthz")
@@ -29,8 +37,19 @@ class TestHealthz:
 
     @pytest.mark.asyncio
     async def test_healthz_counts_mismatch(self, client: AsyncClient) -> None:
+        mock_qdrant = MagicMock()
+        mock_qdrant.close = AsyncMock()
+
         with (
-            patch("pac_api.routes.health._qdrant_count", new_callable=AsyncMock, return_value=10),
+            patch(
+                "pac_api.routes.health.AsyncQdrantClient",
+                return_value=mock_qdrant,
+            ),
+            patch(
+                "pac_api.routes.health._qdrant_count",
+                new_callable=AsyncMock,
+                return_value=10,
+            ),
             patch("pac_api.routes.health._tantivy_count", return_value=5),
         ):
             response = await client.get("/healthz")

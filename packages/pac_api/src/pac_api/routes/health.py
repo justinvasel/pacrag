@@ -17,24 +17,31 @@ log = structlog.get_logger()
 router = APIRouter()
 
 
-async def _qdrant_count() -> int:
-    client = AsyncQdrantClient(path=str(settings.qdrant_path))
+def _build_tantivy_schema() -> tantivy.Schema:
+    builder = tantivy.SchemaBuilder()
+    builder.add_text_field("chunk_id", stored=True, tokenizer_name="raw")
+    builder.add_text_field("opinion_id", stored=True, tokenizer_name="raw")
+    builder.add_text_field("text", stored=True)
+    builder.add_integer_field("year", stored=True, indexed=True, fast=True)
+    builder.add_text_field("agency_type", stored=True, tokenizer_name="raw")
+    builder.add_text_field("statute_areas", stored=True, tokenizer_name="raw")
+    builder.add_text_field("finding", stored=True, tokenizer_name="raw")
+    builder.add_text_field("issue_tags", stored=True, tokenizer_name="raw")
+    return builder.build()
+
+
+async def _qdrant_count(client: AsyncQdrantClient) -> int:
     try:
         info = await client.get_collection(QDRANT_COLLECTION)
         return info.points_count or 0
     except Exception:
         log.warning("qdrant_health_check_failed", exc_info=True)
         return 0
-    finally:
-        await client.close()
 
 
 def _tantivy_count() -> int:
     try:
-        builder = tantivy.SchemaBuilder()
-        builder.add_text_field("chunk_id", stored=True, tokenizer_name="raw")
-        builder.add_text_field("text", stored=True)
-        schema = builder.build()
+        schema = _build_tantivy_schema()
         index = tantivy.Index(schema, path=str(settings.tantivy_path), reuse=True)
         index.reload()
         searcher = index.searcher()
@@ -46,10 +53,15 @@ def _tantivy_count() -> int:
 
 @router.get("/healthz", response_model=HealthResponse)
 async def healthz(db: OpinionDB = Depends(get_db)) -> HealthResponse:
-    qdrant_count, tantivy_count = await asyncio.gather(
-        _qdrant_count(),
-        asyncio.to_thread(_tantivy_count),
-    )
+    qdrant = AsyncQdrantClient(path=str(settings.qdrant_path))
+    try:
+        qdrant_count, tantivy_count = await asyncio.gather(
+            _qdrant_count(qdrant),
+            asyncio.to_thread(_tantivy_count),
+        )
+    finally:
+        await qdrant.close()
+
     duckdb_chunks = db.get_chunk_count()
     duckdb_opinions = db.get_opinion_count()
 
