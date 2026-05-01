@@ -1,2 +1,3 @@
-def hello() -> str:
-    return "Hello from pac-api!"
+from pac_api.main import app
+
+__all__ = ["app"]
