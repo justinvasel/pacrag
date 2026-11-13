@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Iterator
 from datetime import date
 from pathlib import Path
 
@@ -9,7 +10,7 @@ from pac_pipeline.extract_models import OpinionMetadata, RejectedTagSuggestion
 
 
 @pytest.fixture
-def extract_db(tmp_db_with_parsed_opinions: Path) -> ExtractDB:
+def extract_db(tmp_db_with_parsed_opinions: Path) -> Iterator[ExtractDB]:
     with ExtractDB(tmp_db_with_parsed_opinions) as db:
         yield db
 
@@ -152,8 +153,7 @@ class TestUpsertMetadata:
         extract_db.upsert_metadata(meta2, extractor_version="0.2.0")
 
         rows = extract_db._conn.execute(
-            "SELECT finding, extractor_version FROM opinion_metadata "
-            "WHERE opinion_id = '25-FC-118'"
+            "SELECT finding, extractor_version FROM opinion_metadata WHERE opinion_id = '25-FC-118'"
         ).fetchall()
         assert len(rows) == 1
         assert rows[0][0] == "no_violation"

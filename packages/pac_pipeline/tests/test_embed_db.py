@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Iterator
 from pathlib import Path
 
 import pytest
@@ -8,7 +9,7 @@ from pac_pipeline.embed_db import EmbedDB
 
 
 @pytest.fixture
-def embed_db(tmp_db_with_extracted_opinions: Path) -> EmbedDB:
+def embed_db(tmp_db_with_extracted_opinions: Path) -> Iterator[EmbedDB]:
     with EmbedDB(tmp_db_with_extracted_opinions) as db:
         yield db
 
@@ -25,9 +26,9 @@ def _make_chunks(opinion_id: str = "25-FC-118", count: int = 3) -> list[Chunk]:
             token_count=6,
             year=2025,
             agency_type="city",
-            statute_areas=["APRA"],
+            statute_areas=("APRA",),
             finding="violation",
-            issue_tags=["denial-of-access"],
+            issue_tags=("denial-of-access",),
         )
         for i in range(count)
     ]

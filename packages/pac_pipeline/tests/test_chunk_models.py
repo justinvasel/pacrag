@@ -22,9 +22,9 @@ class TestChunk:
             token_count=5,
             year=2025,
             agency_type="city",
-            statute_areas=["APRA"],
+            statute_areas=("APRA",),
             finding="violation",
-            issue_tags=["denial-of-access"],
+            issue_tags=("denial-of-access",),
         )
         assert chunk.chunk_id == "25-FC-118#c0"
         assert chunk.opinion_id == "25-FC-118"
@@ -38,6 +38,25 @@ class TestChunk:
         assert chunk.finding == "violation"
         assert chunk.issue_tags == ("denial-of-access",)
 
+    def test_coerces_lists_to_tuples(self) -> None:
+        # Rows read back from DuckDB/Qdrant carry lists; the model must freeze them.
+        chunk = Chunk(
+            chunk_id="25-FC-118#c0",
+            opinion_id="25-FC-118",
+            chunk_index=0,
+            section="card",
+            page_num=1,
+            text="Text.",
+            token_count=1,
+            year=2025,
+            agency_type="city",
+            statute_areas=["APRA", "ODL"],  # type: ignore[arg-type]
+            finding="violation",
+            issue_tags=["denial-of-access"],  # type: ignore[arg-type]
+        )
+        assert chunk.statute_areas == ("APRA", "ODL")
+        assert chunk.issue_tags == ("denial-of-access",)
+
     def test_chunk_id_format(self) -> None:
         chunk = Chunk(
             chunk_id="24-INF-01#c3",
@@ -49,9 +68,9 @@ class TestChunk:
             token_count=3,
             year=2024,
             agency_type="state_agency",
-            statute_areas=["ODL"],
+            statute_areas=("ODL",),
             finding="no_violation",
-            issue_tags=[],
+            issue_tags=(),
         )
         assert chunk.chunk_id == "24-INF-01#c3"
         assert chunk.chunk_index == 3
@@ -67,9 +86,9 @@ class TestChunk:
             token_count=1,
             year=2025,
             agency_type="city",
-            statute_areas=["APRA"],
+            statute_areas=("APRA",),
             finding="violation",
-            issue_tags=[],
+            issue_tags=(),
         )
         with pytest.raises(ValidationError, match="frozen_instance"):
             chunk.text = "changed"  # type: ignore[misc]
@@ -85,9 +104,9 @@ class TestChunk:
             token_count=6,
             year=2025,
             agency_type="city",
-            statute_areas=["APRA", "ODL"],
+            statute_areas=("APRA", "ODL"),
             finding="mixed",
-            issue_tags=["serial-meetings", "denial-of-access"],
+            issue_tags=("serial-meetings", "denial-of-access"),
         )
         assert chunk.statute_areas == ("APRA", "ODL")
         assert len(chunk.issue_tags) == 2
@@ -104,9 +123,9 @@ class TestChunk:
                 token_count=1,
                 year=2025,
                 agency_type="city",
-                statute_areas=["APRA"],
+                statute_areas=("APRA",),
                 finding="violation",
-                issue_tags=[],
+                issue_tags=(),
             )
             assert chunk.section == section
 
