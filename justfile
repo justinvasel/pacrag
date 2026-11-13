@@ -17,17 +17,17 @@ test:
     uv run pytest
 
 # Indexing pipeline (run in order; each stage is idempotent)
-crawl:
-    uv run pac-crawl
+crawl *ARGS:
+    uv run pac-crawl {{ARGS}}
 
-parse:
-    uv run pac-parse
+parse *ARGS:
+    uv run pac-parse {{ARGS}}
 
-extract:
-    uv run pac-extract
+extract *ARGS:
+    uv run pac-extract {{ARGS}}
 
-embed:
-    uv run pac-embed
+embed *ARGS:
+    uv run pac-embed {{ARGS}}
 
 # Eval
 eval *ARGS:
