@@ -1,0 +1,558 @@
+version: "1.0"
+entries:
+  # --- APRA: Response timeline ---
+  - id: "q001"
+    question: "How quickly must a public agency respond to a public records request under Indiana law?"
+    statute_area: "APRA"
+    expected_opinions:
+      - "17-FC-213"
+      - "05-FC-178"
+    ideal_answer: |
+      Under APRA, a public agency must respond to a records request within
+      a reasonable period of time. The PAC has generally interpreted this
+      as requiring at least an acknowledgment within 24 hours of receiving
+      the request. Failure to respond at all constitutes a denial.
+    key_facts:
+      - "APRA requires response within a reasonable period of time"
+      - "Failure to respond is treated as a denial of access"
+      - "The agency should at minimum acknowledge receipt of the request"
+
+  - id: "q002"
+    question: "A city has not responded to my public records request submitted three weeks ago. Is this a violation of APRA?"
+    statute_area: "APRA"
+    expected_opinions:
+      - "17-FC-213"
+      - "08-FC-60"
+    ideal_answer: |
+      Yes, a three-week delay without response would likely constitute a
+      violation of APRA. The PAC has consistently found that agencies must
+      respond within a reasonable time and that prolonged silence amounts
+      to a denial of access.
+    key_facts:
+      - "Prolonged failure to respond violates APRA"
+      - "Silence is treated as a constructive denial"
+
+  # --- APRA: Fee charging and copying costs ---
+  - id: "q003"
+    question: "Can a county charge $1.00 per page for copies of public records?"
+    statute_area: "APRA"
+    expected_opinions:
+      - "99-FC-3"
+      - "01-FC-62"
+    ideal_answer: |
+      APRA limits copy charges to the agency's actual cost of reproduction.
+      The PAC has examined per-page fees and found that charges exceeding
+      actual costs violate the statute. Whether $1.00 per page is permissible
+      depends on whether the agency can demonstrate it reflects actual cost.
+    key_facts:
+      - "APRA limits copy fees to actual cost of reproduction"
+      - "Agencies must be able to justify per-page charges"
+      - "IC 5-14-3-8 governs fee limitations"
+
+  - id: "q004"
+    question: "A sewer district told me I have to come in person to inspect and copy records myself instead of providing me copies. Can they do that?"
+    statute_area: "APRA"
+    expected_opinions:
+      - "16-FC-41"
+    ideal_answer: |
+      Under APRA, an agency generally cannot force a requester to inspect
+      records in person if the requester asks for copies. The PAC has found
+      that requiring in-person inspection when copies are available and
+      requested is a violation of the Act.
+    key_facts:
+      - "APRA requires agencies to provide copies when requested"
+      - "Requiring in-person inspection instead of providing copies can violate APRA"
+
+  # --- APRA: Reasonable particularity ---
+  - id: "q005"
+    question: "A police department says my records request is too broad and lacks reasonable particularity. What does that mean?"
+    statute_area: "APRA"
+    expected_opinions:
+      - "09-FC-232"
+      - "22-FC-71"
+    ideal_answer: |
+      Under APRA, a records request must identify the records sought with
+      reasonable particularity. This means describing the records with enough
+      specificity that the agency can locate them. However, the agency cannot
+      set an unreasonably high bar for specificity to deny access.
+    key_facts:
+      - "APRA requires requests to identify records with reasonable particularity"
+      - "Agencies cannot impose overly burdensome specificity requirements"
+      - "IC 5-14-3-3 addresses the form of records requests"
+
+  # --- APRA: Investigatory records and law enforcement ---
+  - id: "q006"
+    question: "Can a prosecutor's office withhold emails related to an investigation under the investigatory records exemption?"
+    statute_area: "APRA"
+    expected_opinions:
+      - "16-FC-85"
+    ideal_answer: |
+      APRA provides an exemption for investigatory records of law enforcement
+      agencies under IC 5-14-3-4(b)(1). However, this exemption is discretionary,
+      not mandatory, and the agency must be acting in a law enforcement capacity.
+      The PAC examines whether the records are truly investigatory in nature.
+    key_facts:
+      - "IC 5-14-3-4(b)(1) provides a discretionary exemption for investigatory records"
+      - "The exemption applies to law enforcement agencies acting in that capacity"
+      - "The exemption is discretionary, not mandatory"
+
+  - id: "q007"
+    question: "I requested 911 audio recordings and the city denied my request citing law enforcement exemptions. Is that proper?"
+    statute_area: "APRA"
+    expected_opinions:
+      - "14-FC-287"
+      - "16-FC-73"
+    ideal_answer: |
+      The law enforcement exemption under APRA is discretionary and requires
+      the agency to demonstrate that the records are investigatory in nature.
+      Whether 911 recordings qualify depends on whether they are part of an
+      active investigation and the specific circumstances of the request.
+    key_facts:
+      - "911 recordings may be subject to the investigatory records exemption"
+      - "The exemption is discretionary and context-dependent"
+
+  # --- APRA: Attorney-client privilege and redaction ---
+  - id: "q008"
+    question: "Can a state agency redact portions of attorney invoices before providing them under a records request?"
+    statute_area: "APRA"
+    expected_opinions:
+      - "23-FC-117"
+    ideal_answer: |
+      Yes, APRA allows agencies to redact information protected by attorney-client
+      privilege from otherwise public records. Attorney invoices are generally
+      public, but descriptions of legal work that would reveal privileged
+      communications or litigation strategy may be redacted.
+    key_facts:
+      - "Attorney invoices are generally public records"
+      - "Privileged descriptions of legal work may be redacted"
+      - "Attorney-client privilege is recognized as a basis for redaction under APRA"
+
+  # --- APRA: Deliberative materials ---
+  - id: "q009"
+    question: "Can a school corporation deny access to records by claiming they are deliberative materials?"
+    statute_area: "APRA"
+    expected_opinions:
+      - "11-FC-218"
+      - "07-FC-156"
+    ideal_answer: |
+      APRA provides a discretionary exemption for deliberative materials under
+      IC 5-14-3-4(b)(6). However, this exemption is narrowly construed and
+      applies only to records expressing opinions or providing recommendations
+      as part of a deliberative process. Factual information is not exempt.
+    key_facts:
+      - "Deliberative materials exemption under IC 5-14-3-4(b)(6) is discretionary"
+      - "The exemption covers opinions and recommendations, not factual information"
+      - "The exemption is narrowly construed"
+
+  # --- APRA: Personnel files ---
+  - id: "q010"
+    question: "Are personnel files of public employees available under APRA?"
+    statute_area: "APRA"
+    expected_opinions:
+      - "05-FC-154"
+      - "05-FC-178"
+    ideal_answer: |
+      Personnel files of public employees have limited disclosure under APRA.
+      IC 5-14-3-4(b)(8) provides a discretionary exemption for personnel
+      file information, but certain information like name, compensation,
+      job title, and education is generally required to be disclosed.
+    key_facts:
+      - "IC 5-14-3-4(b)(8) covers the personnel file exemption"
+      - "The exemption is discretionary"
+      - "Basic employment information like name and salary must be disclosed"
+
+  # --- APRA: Format of records / electronic records ---
+  - id: "q011"
+    question: "Can I request public records in electronic format, or can the agency insist on paper copies?"
+    statute_area: "APRA"
+    expected_opinions:
+      - "10-FC-91"
+      - "15-INF-15"
+    ideal_answer: |
+      Under APRA, a requester may ask for records in a specific format, and
+      the agency should provide them in that format if it maintains the records
+      electronically. The agency cannot insist on providing only paper copies
+      if electronic versions are available and requested.
+    key_facts:
+      - "Requesters may specify the desired format of records"
+      - "Agencies should provide records in the format maintained if requested"
+
+  # --- APRA: Email as public record ---
+  - id: "q012"
+    question: "Are government employees' work emails considered public records under Indiana law?"
+    statute_area: "APRA"
+    expected_opinions:
+      - "08-FC-175"
+      - "17-INF-07"
+    ideal_answer: |
+      Yes, emails created or received by government employees in connection
+      with their official duties are generally public records under APRA.
+      The PAC has consistently held that electronic communications on government
+      systems are subject to disclosure, though specific exemptions may apply
+      to the content.
+    key_facts:
+      - "Work emails of government employees are generally public records"
+      - "APRA applies to electronic communications on government systems"
+      - "Content-based exemptions may still apply"
+
+  # --- ODL: Executive session notice ---
+  - id: "q013"
+    question: "A county council held an executive session without posting the required 48-hour notice. Is that a violation of the Open Door Law?"
+    statute_area: "ODL"
+    expected_opinions:
+      - "11-FC-169"
+      - "17-FC-50"
+    ideal_answer: |
+      Yes, the Open Door Law requires governing bodies to post notice of
+      meetings, including executive sessions, at least 48 hours in advance.
+      Failure to provide adequate notice is a violation of the ODL.
+    key_facts:
+      - "ODL requires 48-hour advance notice of meetings"
+      - "Executive sessions require proper notice"
+      - "Inadequate notice is a violation of the Open Door Law"
+
+  # --- ODL: Executive session purpose ---
+  - id: "q014"
+    question: "Can a school board discuss teacher discipline in executive session?"
+    statute_area: "ODL"
+    expected_opinions:
+      - "19-FC-10"
+      - "12-FC-105"
+    ideal_answer: |
+      The Open Door Law permits executive sessions for specific purposes
+      listed in IC 5-14-1.5-6.1, which includes discussion of personnel
+      matters. However, any final action on personnel matters must be taken
+      in a public meeting, not in executive session.
+    key_facts:
+      - "IC 5-14-1.5-6.1 lists permitted executive session purposes"
+      - "Personnel matters may be discussed in executive session"
+      - "Final action must be taken in a public meeting"
+
+  - id: "q015"
+    question: "Our school board took a vote during executive session to terminate a superintendent's contract. Is that lawful?"
+    statute_area: "ODL"
+    expected_opinions:
+      - "19-FC-10"
+      - "11-FC-283"
+    ideal_answer: |
+      No. The Open Door Law prohibits governing bodies from taking final
+      action in executive session. While personnel matters may be discussed
+      in executive session, any vote or binding decision must occur in a
+      public meeting. Taking final action in executive session violates
+      the ODL.
+    key_facts:
+      - "Final action cannot be taken in executive session"
+      - "Votes must occur in public meetings"
+      - "The prohibition applies even for personnel matters"
+
+  # --- ODL: Serial meetings ---
+  - id: "q016"
+    question: "Three members of a five-member board discussed pending business via email. Does this violate the Open Door Law?"
+    statute_area: "ODL"
+    expected_opinions:
+      - "17-FC-50"
+      - "07-FC-200"
+    ideal_answer: |
+      If a majority of the governing body communicates about public business
+      outside of a properly noticed meeting, this may constitute a serial
+      meeting in violation of the Open Door Law. The ODL prohibits any
+      gathering or exchange that amounts to collective deliberation by a
+      quorum outside of a public meeting.
+    key_facts:
+      - "A majority communicating about public business may constitute a serial meeting"
+      - "Serial meetings violate the Open Door Law"
+      - "The prohibition covers electronic communications"
+
+  # --- ODL: Public meeting notice ---
+  - id: "q017"
+    question: "A town council posted a different agenda outside the meeting than the one discussed inside. Is that an ODL violation?"
+    statute_area: "ODL"
+    expected_opinions:
+      - "05-FC-54"
+    ideal_answer: |
+      Yes, the Open Door Law requires that notice of meetings include the
+      agenda or subject matter to be discussed. Posting a misleading or
+      different agenda than what is actually discussed can constitute a
+      violation of the notice requirements.
+    key_facts:
+      - "Meeting notice must include agenda or subject matter"
+      - "Misleading agenda notices violate the ODL"
+
+  # --- ODL: Public agency definition ---
+  - id: "q018"
+    question: "Is the Indiana House of Representatives Republican Caucus subject to the Open Door Law?"
+    statute_area: "ODL"
+    expected_opinions:
+      - "20-INF-11"
+    ideal_answer: |
+      The applicability of the Open Door Law depends on whether the body
+      qualifies as a "governing body" under IC 5-14-1.5-2. Legislative
+      caucuses present unique questions about ODL coverage, and the PAC
+      has addressed whether such bodies meet the statutory definition.
+    key_facts:
+      - "ODL applies to governing bodies as defined in IC 5-14-1.5-2"
+      - "Whether a caucus qualifies depends on statutory analysis"
+
+  # --- ODL: Board retreat as meeting ---
+  - id: "q019"
+    question: "Does a school board retreat count as a public meeting under the Open Door Law?"
+    statute_area: "ODL"
+    expected_opinions:
+      - "04-FC-84"
+    ideal_answer: |
+      If a quorum of the governing body gathers and discusses public business,
+      the gathering qualifies as a meeting under the Open Door Law regardless
+      of what it is called. A retreat where board members discuss policy or
+      business matters would need to comply with ODL notice requirements.
+    key_facts:
+      - "Any gathering of a quorum where public business is discussed is a meeting"
+      - "The label given to the gathering is irrelevant"
+      - "ODL requirements apply regardless of the setting"
+
+  # --- Mixed APRA/ODL ---
+  - id: "q020"
+    question: "A school board discussed a survey in executive session and then denied my request for the survey results. Can they do both?"
+    statute_area: "both"
+    expected_opinions:
+      - "12-FC-105"
+    ideal_answer: |
+      The PAC would analyze the executive session under ODL requirements and
+      the records denial under APRA separately. Executive session must be
+      for a permitted purpose, and denying access to a survey would need to
+      be justified under a specific APRA exemption.
+    key_facts:
+      - "Executive session and records denial are analyzed under separate statutes"
+      - "Executive session requires a permitted purpose under IC 5-14-1.5-6.1"
+      - "Records denial must cite a specific APRA exemption"
+
+  - id: "q021"
+    question: "A community school board held an executive session about a personnel matter and refused to release the minutes. What are the rules?"
+    statute_area: "both"
+    expected_opinions:
+      - "11-FC-283"
+      - "19-FC-10"
+    ideal_answer: |
+      Under the ODL, executive session minutes or memoranda must be kept but
+      are not required to be disclosed to the public. However, the executive
+      session itself must be for a permitted purpose, and any final action
+      must be taken in a public meeting.
+    key_facts:
+      - "Executive session memoranda are maintained but not publicly disclosable"
+      - "Executive session must be for a permitted purpose"
+      - "Final action must occur in a public meeting"
+
+  # --- Specific agency types ---
+  - id: "q022"
+    question: "Can a utility district deny access to records about water testing results?"
+    statute_area: "APRA"
+    expected_opinions:
+      - "16-FC-41"
+    ideal_answer: |
+      A utility district is generally a public agency subject to APRA.
+      Water testing results would typically be public records unless a
+      specific statutory exemption applies. The burden is on the agency
+      to demonstrate that an exemption covers the requested records.
+    key_facts:
+      - "Utility districts are public agencies subject to APRA"
+      - "The burden is on the agency to justify any denial"
+
+  - id: "q023"
+    question: "Does a court clerk have to provide copies of court records under APRA?"
+    statute_area: "APRA"
+    expected_opinions:
+      - "05-FC-108"
+      - "10-FC-58"
+    ideal_answer: |
+      Court clerks are generally subject to APRA, but certain court records
+      may be governed by court administrative rules rather than APRA. The
+      PAC has addressed the intersection of APRA and court record access
+      requirements.
+    key_facts:
+      - "Court clerks are subject to APRA"
+      - "Some court records may be governed by separate administrative rules"
+      - "Agencies must respond within a reasonable time"
+
+  # --- Denial and constructive denial ---
+  - id: "q024"
+    question: "A state agency denied my records request citing ongoing litigation. Is that a valid reason?"
+    statute_area: "APRA"
+    expected_opinions:
+      - "14-FC-158"
+    ideal_answer: |
+      APRA does not contain a blanket exemption for records related to
+      pending litigation. However, specific exemptions such as attorney-client
+      privilege or work product may apply to particular records within the
+      scope of litigation. The agency must identify which exemption applies
+      to each denied record.
+    key_facts:
+      - "There is no blanket litigation exemption under APRA"
+      - "Specific exemptions may apply to individual records"
+      - "The agency must cite specific statutory authority for denial"
+
+  # --- Commercial trade secrets ---
+  - id: "q025"
+    question: "A town refused to give me building plans for homes, claiming they are trade secrets. Is that valid under APRA?"
+    statute_area: "APRA"
+    expected_opinions:
+      - "15-INF-15"
+    ideal_answer: |
+      APRA provides a discretionary exemption for trade secrets under
+      IC 5-14-3-4(b)(6). Whether building plans qualify as trade secrets
+      depends on whether they meet the statutory definition. The PAC has
+      addressed when design documents may or may not qualify for this
+      exemption.
+    key_facts:
+      - "Trade secrets are a discretionary exemption under APRA"
+      - "Records must meet the statutory definition of trade secrets"
+      - "Building plans may or may not qualify depending on circumstances"
+
+  # --- Regional planning commission ---
+  - id: "q026"
+    question: "How should a regional planning commission handle multiple simultaneous APRA requests covering personnel and deliberative records?"
+    statute_area: "APRA"
+    expected_opinions:
+      - "08-INF-40"
+    ideal_answer: |
+      A regional planning commission is a public agency subject to APRA.
+      When handling multiple requests, the agency must evaluate each request
+      independently and apply applicable exemptions. Both the personnel file
+      and deliberative materials exemptions are discretionary.
+    key_facts:
+      - "Regional planning commissions are public agencies"
+      - "Each request should be evaluated independently"
+      - "Personnel and deliberative exemptions are discretionary"
+
+  # --- Redaction practices ---
+  - id: "q027"
+    question: "A probation department redacted four pages of emails I requested. When can an agency redact records under APRA?"
+    statute_area: "APRA"
+    expected_opinions:
+      - "07-FC-156"
+    ideal_answer: |
+      Under APRA, when a record contains both disclosable and non-disclosable
+      information, the agency must separate and provide the disclosable portions.
+      The agency must cite the specific statutory exemption justifying each
+      redaction and cannot redact entire documents when only portions are exempt.
+    key_facts:
+      - "Agencies must separate disclosable from non-disclosable information"
+      - "Each redaction must be justified by a specific statutory exemption"
+      - "Wholesale redaction of entire documents is disfavored"
+
+  # --- Housing agency records ---
+  - id: "q028"
+    question: "I requested housing inspection records from a housing agency and was denied. Are housing agencies subject to APRA?"
+    statute_area: "APRA"
+    expected_opinions:
+      - "24-FC-32"
+    ideal_answer: |
+      Housing agencies that receive public funds or perform governmental
+      functions are generally subject to APRA. The PAC has found that
+      such agencies must comply with public records requests and that
+      housing inspection records are generally disclosable.
+    key_facts:
+      - "Housing agencies can be subject to APRA"
+      - "Inspection records are generally public records"
+      - "Agencies must respond to requests in a timely manner"
+
+  # --- Questions that should not have direct answers ---
+  - id: "q029"
+    question: "Does APRA apply to private businesses that receive state contracts?"
+    statute_area: "APRA"
+    expected_opinions:
+      - "08-INF-40"
+    ideal_answer: |
+      APRA generally applies to public agencies, not private businesses.
+      However, the question of whether a private entity receiving public
+      funds qualifies as a public agency under APRA depends on the nature
+      of the relationship and the degree of governmental control.
+    key_facts:
+      - "APRA applies to public agencies as defined in the statute"
+      - "Private entities may be subject if they function as public agencies"
+
+  - id: "q030"
+    question: "Can I sue an agency in court for violating APRA without first filing a complaint with the PAC?"
+    statute_area: "APRA"
+    expected_opinions:
+      - "14-FC-158"
+    ideal_answer: |
+      Filing a complaint with the PAC is not a prerequisite to filing a
+      lawsuit under APRA. The statutes provide separate remedies. However,
+      PAC opinions can provide helpful guidance on the merits of a dispute.
+    key_facts:
+      - "PAC complaints and court actions are separate remedies"
+      - "Filing with the PAC is not required before suing"
+
+  # --- Broad cross-year coverage ---
+  - id: "q031"
+    question: "What are the most common reasons agencies cite for denying public records requests in Indiana?"
+    statute_area: "APRA"
+    expected_opinions:
+      - "09-FC-232"
+      - "16-FC-85"
+      - "11-FC-218"
+    ideal_answer: |
+      Common reasons agencies cite include investigatory records exemptions,
+      personnel file exemptions, deliberative materials exemptions, attorney-client
+      privilege, and lack of reasonable particularity in the request. The PAC
+      evaluates whether these citations are properly applied.
+    key_facts:
+      - "Investigatory records under IC 5-14-3-4(b)(1)"
+      - "Personnel files under IC 5-14-3-4(b)(8)"
+      - "Deliberative materials under IC 5-14-3-4(b)(6)"
+      - "Attorney-client privilege"
+
+  - id: "q032"
+    question: "Has the PAC found violations against the City of Gary for public records issues?"
+    statute_area: "APRA"
+    expected_opinions:
+      - "17-FC-213"
+    ideal_answer: |
+      Yes, the PAC has found violations against the City of Gary, including
+      for failure to respond to public records requests in a timely manner.
+    key_facts:
+      - "The PAC found the City of Gary violated APRA"
+      - "The violation involved failure to respond to a records request"
+
+  - id: "q033"
+    question: "How does the PAC handle complaints about county auditor offices denying records?"
+    statute_area: "APRA"
+    expected_opinions:
+      - "07-FC-340"
+    ideal_answer: |
+      The PAC investigates complaints against county auditor offices like
+      any other public agency. If the auditor's office does not maintain
+      the requested records, it should direct the requester to the
+      appropriate office rather than simply denying access.
+    key_facts:
+      - "County auditor offices are subject to APRA"
+      - "Agencies should redirect requesters to the correct custodian"
+
+  - id: "q034"
+    question: "A town denied my records request saying the records don't exist. What should I do?"
+    statute_area: "APRA"
+    expected_opinions:
+      - "03-FC-122"
+      - "22-FC-71"
+    ideal_answer: |
+      If an agency claims records do not exist, the PAC generally accepts
+      that representation unless there is evidence to the contrary. However,
+      the agency should conduct a reasonable search and respond in a
+      timely manner explaining that the records were not found.
+    key_facts:
+      - "Agencies must conduct a reasonable search for requested records"
+      - "A denial based on nonexistence should be communicated clearly"
+      - "The PAC generally accepts an agency's representation about record existence"
+
+  - id: "q035"
+    question: "What happens when a horse racing commission negotiation committee meets privately? Is the Open Door Law implicated?"
+    statute_area: "ODL"
+    expected_opinions:
+      - "13-INF-30"
+    ideal_answer: |
+      Whether a negotiation committee is subject to the ODL depends on
+      whether it meets the definition of a governing body. The PAC has
+      analyzed whether committees established by statute qualify as
+      governing bodies for ODL purposes.
+    key_facts:
+      - "ODL applicability depends on whether the body is a governing body"
+      - "Statutory committees may or may not be subject to ODL"
