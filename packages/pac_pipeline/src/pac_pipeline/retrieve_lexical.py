@@ -31,16 +31,24 @@ def _doc_to_chunk(doc: tantivy.Document) -> Chunk:
     )
 
 
+def _sanitize_query(text: str) -> str:
+    result = text.replace("'", "").replace("\u2019", "")
+    result = result.replace(":", " ")
+    return result
+
+
 def _build_query(
     question: str,
     index: tantivy.Index,
     filters: InferredFilters | None,
 ) -> tantivy.Query:
+    sanitized = _sanitize_query(question)
+
     if filters is None or not filters.has_any():
-        return index.parse_query(question, default_field_names=["text"])
+        return index.parse_query(sanitized, default_field_names=["text"])
 
     subqueries: list[tuple[Occur, tantivy.Query]] = [
-        (Occur.Must, index.parse_query(question, default_field_names=["text"])),
+        (Occur.Must, index.parse_query(sanitized, default_field_names=["text"])),
     ]
 
     if filters.agency_type is not None:

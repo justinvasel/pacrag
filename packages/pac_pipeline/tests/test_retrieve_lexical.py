@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import tantivy
-from pac_pipeline.retrieve_lexical import _doc_to_chunk
+from pac_pipeline.retrieve_lexical import _doc_to_chunk, _sanitize_query
 
 
 def _make_tantivy_doc(**fields: object) -> tantivy.Document:
@@ -64,3 +64,23 @@ class TestDocToChunk:
         assert chunk.section == ""
         assert chunk.page_num == 0
         assert chunk.token_count == 0
+
+
+class TestSanitizeQuery:
+    def test_strips_apostrophes(self) -> None:
+        assert _sanitize_query("prosecutor's office") == "prosecutors office"
+
+    def test_strips_curly_apostrophes(self) -> None:
+        assert _sanitize_query("employees\u2019 work") == "employees work"
+
+    def test_replaces_colons_with_space(self) -> None:
+        assert _sanitize_query("test: something") == "test  something"
+
+    def test_preserves_normal_text(self) -> None:
+        assert _sanitize_query("normal question about APRA") == "normal question about APRA"
+
+    def test_preserves_statute_references(self) -> None:
+        assert _sanitize_query("IC 5-14-3-4(b)(8)") == "IC 5-14-3-4(b)(8)"
+
+    def test_handles_contractions(self) -> None:
+        assert _sanitize_query("records don't exist") == "records dont exist"
