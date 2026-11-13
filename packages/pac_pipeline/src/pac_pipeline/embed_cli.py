@@ -2,12 +2,12 @@ from __future__ import annotations
 
 import argparse
 import logging
-import os
 from pathlib import Path
 
 import structlog
 from dotenv import load_dotenv
 
+from pac_pipeline.config import settings
 from pac_pipeline.embed import embed_all
 
 log = structlog.get_logger()
@@ -53,7 +53,7 @@ def main() -> None:
 
     configure_logging(verbose=args.verbose)
 
-    db_path = args.db_path or Path(os.environ.get("PAC_DUCKDB_PATH", "./data/catalog/pac.duckdb"))
+    db_path = args.db_path or settings.duckdb_path
 
     embedded, errors = embed_all(
         db_path=db_path,

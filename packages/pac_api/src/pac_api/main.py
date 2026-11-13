@@ -9,8 +9,8 @@ from anthropic import AsyncAnthropic
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pac_pipeline import get_retrieval_models
+from pac_pipeline.config import settings
 
-from pac_api.config import settings
 from pac_api.db import OpinionDB
 from pac_api.routes import ask, health, opinions, search
 

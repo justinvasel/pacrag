@@ -55,36 +55,29 @@ class TestBuildParser:
 
 
 class TestMain:
-    def test_calls_parse_all_with_defaults(self, tmp_path: Path) -> None:
+    def test_calls_parse_all_with_settings_defaults(self, tmp_path: Path) -> None:
         with (
             patch("pac_pipeline.cli.parse_all", return_value=(0, 0)) as mock_parse,
-            patch.dict(
-                "os.environ",
-                {
-                    "PAC_DATA_DIR": str(tmp_path / "data"),
-                    "PAC_DUCKDB_PATH": str(tmp_path / "test.duckdb"),
-                },
-            ),
+            patch("pac_pipeline.cli.settings") as mock_settings,
             patch("sys.argv", ["pac-parse"]),
         ):
+            mock_settings.data_dir = tmp_path / "data"
+            mock_settings.duckdb_path = tmp_path / "test.duckdb"
+            mock_settings.lit_binary = "lit-from-settings"
             main()
             mock_parse.assert_called_once()
             call_kwargs = mock_parse.call_args[1]
             assert call_kwargs["data_dir"] == tmp_path / "data"
             assert call_kwargs["db_path"] == tmp_path / "test.duckdb"
+            assert call_kwargs["lit_binary"] == "lit-from-settings"
             assert call_kwargs["year"] is None
             assert call_kwargs["opinion_id"] is None
             assert call_kwargs["reparse"] is False
 
-    def test_cli_flags_override_env(self, tmp_path: Path) -> None:
+    def test_cli_flags_override_settings(self, tmp_path: Path) -> None:
         with (
             patch("pac_pipeline.cli.parse_all", return_value=(0, 0)) as mock_parse,
-            patch.dict(
-                "os.environ",
-                {
-                    "PAC_DATA_DIR": str(tmp_path / "env_data"),
-                },
-            ),
+            patch("pac_pipeline.cli.settings") as mock_settings,
             patch(
                 "sys.argv",
                 [
@@ -96,6 +89,7 @@ class TestMain:
                 ],
             ),
         ):
+            mock_settings.data_dir = tmp_path / "settings_data"
             main()
             call_kwargs = mock_parse.call_args[1]
             assert call_kwargs["data_dir"] == tmp_path / "cli_data"

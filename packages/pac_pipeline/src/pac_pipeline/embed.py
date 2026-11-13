@@ -7,7 +7,6 @@ from pathlib import Path
 import structlog
 import tantivy
 import torch
-from pac_api.config import settings
 from qdrant_client import QdrantClient
 from qdrant_client.models import (
     Distance,
@@ -23,6 +22,7 @@ from tqdm import tqdm
 
 from pac_pipeline.chunk import chunk_opinion
 from pac_pipeline.chunk_models import CHUNKER_VERSION, EMBEDDING_DIM, QDRANT_COLLECTION
+from pac_pipeline.config import settings
 from pac_pipeline.embed_db import EmbedDB
 from pac_pipeline.models import ParsedOpinion
 

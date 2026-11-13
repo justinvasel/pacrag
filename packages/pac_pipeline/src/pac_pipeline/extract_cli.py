@@ -2,12 +2,12 @@ from __future__ import annotations
 
 import argparse
 import logging
-import os
 from pathlib import Path
 
 import structlog
 from dotenv import load_dotenv
 
+from pac_pipeline.config import settings
 from pac_pipeline.extract import extract_all
 
 log = structlog.get_logger()
@@ -54,8 +54,8 @@ def main() -> None:
 
     configure_logging(verbose=args.verbose)
 
-    data_dir = args.data_dir or Path(os.environ.get("PAC_DATA_DIR", "./data"))
-    db_path = args.db_path or Path(os.environ.get("PAC_DUCKDB_PATH", "./data/catalog/pac.duckdb"))
+    data_dir = args.data_dir or settings.data_dir
+    db_path = args.db_path or settings.duckdb_path
 
     extracted, errors = extract_all(
         db_path=db_path,
