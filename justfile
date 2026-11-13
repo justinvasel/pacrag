@@ -16,7 +16,7 @@ format:
 test:
     uv run pytest
 
-# Pipeline (stubs for now, wired up as we go)
+# Indexing pipeline (run in order; each stage is idempotent)
 crawl:
     uv run pac-crawl
 
