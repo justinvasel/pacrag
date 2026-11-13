@@ -29,6 +29,13 @@ extract:
 embed:
     uv run pac-embed
 
+# Eval
+eval *ARGS:
+    uv run pac-eval run {{ARGS}}
+
+eval-diff A B *ARGS:
+    uv run pac-eval diff {{A}} {{B}} {{ARGS}}
+
 # Services
 api:
     uv run uvicorn pac_api.main:app --reload --port 8000

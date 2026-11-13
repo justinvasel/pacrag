@@ -1,22 +1,31 @@
 [project]
 name = "pac-eval"
 version = "0.1.0"
-description = "Add your description here"
+description = "Evaluation harness for PAC RAG retrieval and generation quality"
 readme = "README.md"
 authors = [
     { name = "Justin Vasel", email = "justin.vasel@gmail.com" }
 ]
-requires-python = ">=3.8"
+requires-python = ">=3.12"
 dependencies = [
+    "anthropic>=0.52.0",
     "duckdb>=1.5.2",
+    "pac-api",
     "pac-pipeline",
     "pyarrow>=24.0.0",
     "pydantic>=2.13.3",
+    "python-dotenv>=1.1.0",
+    "pyyaml>=6.0.2",
+    "structlog>=25.1.0",
 ]
+
+[project.scripts]
+pac-eval = "pac_eval.cli:main"
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.uv.sources]
+pac-api = { workspace = true }
 pac-pipeline = { workspace = true }

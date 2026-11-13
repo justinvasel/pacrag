@@ -979,18 +979,28 @@ name = "pac-eval"
 version = "0.1.0"
 source = { editable = "packages/pac_eval" }
 dependencies = [
+    { name = "anthropic" },
     { name = "duckdb" },
+    { name = "pac-api" },
     { name = "pac-pipeline" },
     { name = "pyarrow" },
     { name = "pydantic" },
+    { name = "python-dotenv" },
+    { name = "pyyaml" },
+    { name = "structlog" },
 ]
 
 [package.metadata]
 requires-dist = [
+    { name = "anthropic", specifier = ">=0.52.0" },
     { name = "duckdb", specifier = ">=1.5.2" },
+    { name = "pac-api", editable = "packages/pac_api" },
     { name = "pac-pipeline", editable = "packages/pac_pipeline" },
     { name = "pyarrow", specifier = ">=24.0.0" },
     { name = "pydantic", specifier = ">=2.13.3" },
+    { name = "python-dotenv", specifier = ">=1.1.0" },
+    { name = "pyyaml", specifier = ">=6.0.2" },
+    { name = "structlog", specifier = ">=25.1.0" },
 ]
 
 [[package]]
