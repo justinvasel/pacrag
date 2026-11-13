@@ -66,9 +66,9 @@ pac_api  -> pac_pipeline, pac_crawler
 pac_pipeline -> pac_crawler
 ```
 
-`pac_api` owns the shared `Settings` singleton (`pac_api.config.settings`), including model names (embedding, reranker, extraction, generation). `pac_pipeline` (embed, extract, retrieve) and `pac_eval` import config from there; `pac_crawler` and the pipeline CLIs read `PAC_*` env vars directly. Do not create a separate "common" package.
+`pac_pipeline` owns the shared `Settings` singleton (`pac_pipeline.config.settings`): data paths, `lit_binary`, the Anthropic key, and all model names (embedding, reranker, extraction, generation). `pac_api`, `pac_eval`, the pipeline CLIs, and `scripts/` import it from there; CLI flags override it. `pac_crawler` sits below `pac_pipeline` and reads `PAC_*` env vars directly. Do not create a separate "common" package.
 
-Caveat: `pac_pipeline` imports `pac_api.config` without declaring `pac-api` as a dependency (it can't, since `pac_api` depends on `pac_pipeline`). This works only because the workspace installs all packages together. `pac_api/__init__.py` lazy-loads `app` so importing `pac_api.config` does not build the FastAPI app.
+`pac_api/__init__.py` lazy-loads `app` so importing `pac_api.generation` (as `pac_eval` does) does not build the FastAPI app.
 
 ### Eval harness (`pac_eval`)
 

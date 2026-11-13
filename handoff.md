@@ -22,7 +22,7 @@ What's built:
 - `apps/web/` Next.js 15 app with shadcn/ui v4 already initialized (Radix base, TypeScript, App Router, src dir).
 - Embedded Qdrant under `data/qdrant/`, no service required.
 - Embedding (`BAAI/bge-large-en-v1.5`) and reranker (`BAAI/bge-reranker-v2-m3`) downloaded and cached under `data/models/` via `scripts/warm_models.py`. MPS is detected and used.
-- Anthropic SDK working; `ANTHROPIC_API_KEY` lives in `.env` and is read through `pac_api.config.settings`.
+- Anthropic SDK working; `ANTHROPIC_API_KEY` lives in `.env` and is read through `pac_pipeline.config.settings` (originally `pac_api.config`; moved to break a circular import).
 - A working `scripts/smoke_test.py` that takes one PDF (`25-FC-118`), runs LiteParse, naive-chunks the text, embeds, indexes into Qdrant, retrieves, and generates an answer with Claude. The smoke test has been run successfully and produces a correctly-grounded answer about the Bloomington Transportation Commission case.
 - `justfile` with stub targets (`sync`, `lint`, `format`, `test`, `crawl`, `parse`, `extract`, `embed`, `api`, `web`).
 - Pre-commit hooks installed (ruff, ruff-format, basic hygiene checks).
@@ -108,7 +108,7 @@ pac-rag/
     └── models/                 # HF cache, set HF_HOME here
 ```
 
-`pac_api` owns the shared `config.py` with `Settings`. Every other package imports `from pac_api.config import settings`. Do not create a fifth "common" package; the dependency direction is fine as is.
+`pac_pipeline` owns the shared `config.py` with `Settings`. `pac_api`, `pac_eval`, and scripts import `from pac_pipeline.config import settings`. Do not create a fifth "common" package. (`Settings` originally lived in `pac_api`, but `pac_pipeline` imported it without being able to declare the dependency, since `pac_api` depends on `pac_pipeline`.)
 
 ## Conventions
 

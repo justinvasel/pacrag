@@ -6,9 +6,9 @@ import structlog
 import tantivy
 from fastapi import APIRouter, Depends
 from pac_pipeline.chunk_models import QDRANT_COLLECTION
+from pac_pipeline.config import settings
 from qdrant_client import AsyncQdrantClient
 
-from pac_api.config import settings
 from pac_api.db import OpinionDB
 from pac_api.dependencies import get_db
 from pac_api.schemas import HealthResponse

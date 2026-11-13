@@ -1,4 +1,4 @@
-# packages/pac_api/src/pac_api/config.py
+# packages/pac_pipeline/src/pac_pipeline/config.py
 from pathlib import Path
 
 from pydantic import Field
@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     tantivy_path: Path = Field(default=Path("./data/tantivy"))
     duckdb_path: Path = Field(default=Path("./data/catalog/pac.duckdb"))
     models_dir: Path = Field(default=Path("./data/models"))
+    lit_binary: str = "lit"
 
     anthropic_api_key: str = Field(alias="ANTHROPIC_API_KEY", default="")
 

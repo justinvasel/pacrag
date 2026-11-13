@@ -8,7 +8,7 @@ from pathlib import Path
 
 import torch
 from anthropic import Anthropic
-from pac_api.config import settings
+from pac_pipeline.config import settings
 from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, PointStruct, VectorParams
 from sentence_transformers import SentenceTransformer

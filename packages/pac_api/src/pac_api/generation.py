@@ -4,9 +4,8 @@ from collections.abc import AsyncGenerator
 
 import structlog
 from anthropic import AsyncAnthropic
+from pac_pipeline.config import settings
 from pac_pipeline.retrieve_models import RetrievedChunk
-
-from pac_api.config import settings
 
 log = structlog.get_logger()
 

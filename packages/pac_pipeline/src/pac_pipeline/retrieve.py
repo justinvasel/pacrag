@@ -10,10 +10,10 @@ import structlog
 import tantivy
 import torch
 from anthropic import AsyncAnthropic
-from pac_api.config import settings
 from qdrant_client import AsyncQdrantClient
 from sentence_transformers import CrossEncoder, SentenceTransformer
 
+from pac_pipeline.config import settings
 from pac_pipeline.retrieve_dense import search_dense
 from pac_pipeline.retrieve_filters import infer_filters
 from pac_pipeline.retrieve_fusion import fuse_rrf, rerank

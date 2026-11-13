@@ -5,7 +5,7 @@ from datetime import UTC, datetime
 
 import structlog
 from anthropic import AsyncAnthropic
-from pac_api.config import settings
+from pac_pipeline.config import settings
 from pac_pipeline.retrieve_models import RetrievedChunk
 
 from pac_eval.metrics_answer import compute_citation_precision, compute_hedging_score

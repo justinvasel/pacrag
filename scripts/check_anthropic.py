@@ -1,6 +1,6 @@
 # scripts/check_anthropic.py
 from anthropic import Anthropic
-from pac_api.config import settings
+from pac_pipeline.config import settings
 
 client = Anthropic(api_key=settings.anthropic_api_key)
 msg = client.messages.create(

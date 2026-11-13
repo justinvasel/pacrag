@@ -5,9 +5,9 @@ from pathlib import Path
 
 import structlog
 from anthropic import Anthropic
-from pac_api.config import settings
 from tqdm import tqdm
 
+from pac_pipeline.config import settings
 from pac_pipeline.counselor import extract_counselor
 from pac_pipeline.extract_db import ExtractDB
 from pac_pipeline.extract_models import (
